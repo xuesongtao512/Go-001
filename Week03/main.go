@@ -12,12 +12,23 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
-// 定义一个路由
-func router() *http.ServeMux {
+func app1() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		body, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+		if err != nil {
+			log.Println("recv is failed, err: ", err)
+		}
+		fmt.Fprintln(w, string(body))
+	})
+	return mux
+}
+
+func app2() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
@@ -44,25 +55,28 @@ func server(ctx context.Context, signal <-chan os.Signal, addr string, mux *http
 		case <-signal:
 			log.Println("signal is stop!")
 		}
-		server.Shutdown(ctx)
+		server.Shutdown(context.TODO())
 	}()
 	log.Println("server is running...")
 	return server.ListenAndServe()
 }
 
 func main() {
-	r := router()
+	a1 := app1()
+	a2 := app2()
+	registerServer := make([]*http.ServeMux, 5)
+	registerServer = append(registerServer, a1, a2)
 	signalCh := make(chan os.Signal)
-	// TODO 只监听了两种
 	signal.Notify(signalCh, syscall.SIGKILL|syscall.SIGTERM)
 	g, ctx := errgroup.WithContext(context.Background())
-	g.Go(func() error {
-		if err := server(ctx, signalCh, ":8080", r); err != nil {
-			return errors.Wrap(err, "server run is failed")
-		}
-		return nil
-	})
+	for _, app := range registerServer {
+		g.Go(func() error {
+			return server(ctx, signalCh, ":8080", app)
+		})
+	}
+
 	if err := g.Wait(); err != nil {
 		log.Printf("server run failed, err: %#v", err)
+
 	}
 }
