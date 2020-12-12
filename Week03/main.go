@@ -15,6 +15,11 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+type myServer struct {
+	 app *http.ServeMux
+	 host string
+}
+
 func app1() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -62,16 +67,16 @@ func server(ctx context.Context, signal <-chan os.Signal, addr string, mux *http
 }
 
 func main() {
-	a1 := app1()
-	a2 := app2()
-	registerServer := make([]*http.ServeMux, 5)
+	a1 := &myServer{app:app1(), host:":8080"}
+	a2 := &myServer{app:app2(), host:"8081"}
+	registerServer := make([]*myServer, 0, 2)
 	registerServer = append(registerServer, a1, a2)
 	signalCh := make(chan os.Signal)
 	signal.Notify(signalCh, syscall.SIGKILL|syscall.SIGTERM)
 	g, ctx := errgroup.WithContext(context.Background())
-	for _, app := range registerServer {
+	for _, s := range registerServer {
 		g.Go(func() error {
-			return server(ctx, signalCh, ":8080", app)
+			return server(ctx, signalCh, s.host, s.app)
 		})
 	}
 
