@@ -3,9 +3,8 @@
 package testInternal
 
 import (
-    "gohomework.com/Week04/studyDemo/server"
+    "gohomework.com/Week04/demo1/studyDemo/server"
     "testing"
-    "gohomework.com/Week04/studyDemo/internal/utils"
 )
 
 // 导入 studyDemo/internal/utils.go

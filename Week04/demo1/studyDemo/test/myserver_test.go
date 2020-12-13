@@ -3,7 +3,7 @@
 package test
 
 import (
-    "gohomework.com/Week04/studyDemo/server"
+    "gohomework.com/Week04/demo1/studyDemo/server"
     "testing"
 )
 
