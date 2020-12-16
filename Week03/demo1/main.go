@@ -22,7 +22,7 @@ func main() {
     })
 
     g.Go(func() error {
-        // log.Println("my is ok")
+        // mylog.Println("my is ok")
         a += 2
         return errors.New("xxx")
     })

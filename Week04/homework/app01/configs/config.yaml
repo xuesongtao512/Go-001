@@ -1,0 +1,18 @@
+# 数据库配置
+mysqlHost: localhost:3306
+username: root
+password: 123456
+dbname: my_crm
+
+# 日志配置
+logPath: \mylog\tmp\run.mylog
+# 这里单位是 兆
+logSize: 5
+# 最多保存日志文件数
+maxSaveFiles: 10
+# 最大日志保留天数
+maxSaveDays: 30
+# 是否是生成环境
+isProduction: false
+
+
