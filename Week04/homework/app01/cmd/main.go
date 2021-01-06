@@ -10,7 +10,6 @@ import (
     "context"
 
     "github.com/gin-gonic/gin"
-    "github.com/fvbock/endless"
 
     config "gohomework.com/Week04/homework/app01/configs"
     router2 "gohomework.com/Week04/homework/app01/internal/rotuer"
