@@ -56,7 +56,6 @@ func writeMsg(msgCh <-chan string, exitCh chan<- bool, conn net.Conn) {
 			}
 		}
 		if isStop {
-			close(exitCh)
 			break
 		}
 	}
